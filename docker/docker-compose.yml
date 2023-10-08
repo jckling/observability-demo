@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./prometheus:/etc/prometheus
-      - ./prometheus_data:/prometheus
+      - ./prometheus_data:/prometheus/data
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./alertmanager:/config
-      - ./alertmanager_data:/alertmanager
+      - ./alertmanager_data:/alertmanager/data
     command:
       - '--config.file=/config/alertmanager.yml'
     ports:
@@ -48,6 +48,20 @@ services:
       - ./grafana_data:/var/lib/grafana
     ports:
       - '3000:3000'
+    networks:
+      - monitoring
+
+  consul:
+    image: hashicorp/consul
+    container_name: consul
+    restart: unless-stopped
+    volumes:
+     - ./consul/server.json:/consul/config/server.json
+     - ./consul_data:/consul/data
+    ports:
+      - '8500:8500'
+      - '8600:8600/udp'
+      - '8600:8600/tcp'
     networks:
       - monitoring
 

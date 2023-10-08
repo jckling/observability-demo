@@ -7,9 +7,13 @@ global:
 # Alertmanager configuration
 alerting:
   alertmanagers:
-    - static_configs:
-        - targets:
-          - alertmanager:9093
+    - consul_sd_configs:
+      - server: "consul:8500"
+        services:
+          - alertmanager
+    # - static_configs:
+    #   - targets:
+    #     - alertmanager:9093
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
@@ -30,6 +34,10 @@ scrape_configs:
     honor_timestamps: true
     metrics_path: /metrics
     scheme: http
-    static_configs:
-      - targets:
-          - pushgateway:9091
+    consul_sd_configs:
+      - server: "consul:8500"
+        services:
+          - pushgateway
+    # static_configs:
+    #   - targets:
+    #       - pushgateway:9091

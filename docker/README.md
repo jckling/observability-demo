@@ -19,6 +19,7 @@ docker compose up
 - Grafana: http://localhost:3000
   - username: `admin`
   - password: `grafana`
+- Consul: http://localhost:8500
 
 常用命令
 
@@ -41,6 +42,8 @@ rm -rf *_data/*
 
 ## 测试
 
+### pushgateway
+
 向 pushgateway 推送数据
 
 ```bash
@@ -48,7 +51,9 @@ cat <<EOF | curl --data-binary @- http://localhost:9091/metrics/job/some_job
 # TYPE some_metric counter
 some_metric 31
 EOF
+```
 
+```bash
 cat <<EOF | curl --data-binary @- http://localhost:9091/metrics/job/some_job/instance/some_instance
 # TYPE some_metric counter
 some_metric{label="val1"} 42
@@ -74,6 +79,35 @@ EOF
 curl -X DELETE http://localhost:9091/metrics/job/some_job
 curl -X DELETE http://localhost:9091/metrics/job/some_job/instance/some_instance
 ```
+
+### consul
+
+consul API
+
+```bash
+# 注册
+curl -X PUT --data @payload.json http://localhost:8500/v1/agent/service/register
+
+# 查看
+curl http://localhost:8500/v1/agent/services
+
+# 删除
+curl -X PUT http://localhost:8500/v1/agent/service/deregister/service_id
+```
+
+调用脚本注册服务
+
+```bash
+# 注册服务
+./register-service.sh -r
+
+# 删除服务
+./register-service.sh -d
+```
+
+在 consul 中查看：http://localhost:8500
+
+![](consul.png)
 
 ## 问题解决
 
@@ -111,10 +145,3 @@ grafana  | mkdir: can't create directory '/var/lib/grafana/plugins': Permission 
 ```bash
 sudo chmod 777 *_data
 ```
-
-# 参阅
-
-- [Alertmanager Configuration](https://prometheus.io/docs/alerting/latest/configuration/)
-- [Prometheus Configuration](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
-- [Configure Grafana | Grafana documentation](https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/)
-- [Provision Grafana | Grafana documentation](https://grafana.com/docs/grafana/latest/administration/provisioning/)
