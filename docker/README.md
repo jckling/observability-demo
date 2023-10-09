@@ -6,7 +6,7 @@ Windows + Docker Desktop + WSL
 
 ## 搭建
 
-prometheus + pushgateway + alertmanager + grafana
+prometheus + pushgateway + alertmanager + grafana + loki + consul
 
 ```bash
 docker compose up
@@ -20,12 +20,16 @@ docker compose up
   - username: `admin`
   - password: `grafana`
 - Consul: http://localhost:8500
+- Loki: Grafana 中查看
 
 常用命令
 
 ```bash
+# 创建并启动容器
+docker compose up -d
+
 # 查看容器日志
-docker compose logs -f --tail=50 prometheus
+docker compose logs -f --tail=50 container_name
 
 # 删除网络
 docker network prune
@@ -42,7 +46,7 @@ rm -rf *_data/*
 
 ## 测试
 
-### pushgateway
+### Pushgateway
 
 向 pushgateway 推送数据
 
@@ -65,13 +69,13 @@ EOF
 
 在 pushgateway 中查看：http://localhost:9091
 
-![](some_job.png)
+![](./images/pushgateway-job.png)
 
-![](some_instance.png)
+![](./images/pushgateway-instance.png)
 
 在 grafana 中查看：http://localhost:3000
 
-![](grafana.png)
+![](./images/grafana.png)
 
 删除推送的数据
 
@@ -80,7 +84,17 @@ curl -X DELETE http://localhost:9091/metrics/job/some_job
 curl -X DELETE http://localhost:9091/metrics/job/some_job/instance/some_instance
 ```
 
-### consul
+或进入 `observability-demo/docker/pushgateway` 目录，调用脚本推送
+
+```bash
+# 推送指标
+./push-metrics.sh -p
+
+# 删除指标
+./push-metrics.sh -d
+```
+
+### Consul
 
 consul API
 
@@ -95,7 +109,7 @@ curl http://localhost:8500/v1/agent/services
 curl -X PUT http://localhost:8500/v1/agent/service/deregister/service_id
 ```
 
-调用脚本注册服务
+进入 `observability-demo/docker/consul` 目录，调用脚本注册
 
 ```bash
 # 注册服务
@@ -107,7 +121,32 @@ curl -X PUT http://localhost:8500/v1/agent/service/deregister/service_id
 
 在 consul 中查看：http://localhost:8500
 
-![](consul.png)
+![](./images/consul-services.png)
+
+### Loki
+
+安装插件，用于读取 Docker 容器日志并将其发送到 Loki
+
+```bash
+docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+```
+
+安装完毕后需要重启 Docker
+
+```bash
+sudo systemctl restart docker
+```
+
+重新创建容器，在 prometheus 中查看：http://localhost:3000
+
+![](./images/loki-logging.png)
+
+卸载插件
+
+```bash
+docker plugin disable loki --force
+docker plugin rm loki
+```
 
 ## 问题解决
 
@@ -145,3 +184,15 @@ grafana  | mkdir: can't create directory '/var/lib/grafana/plugins': Permission 
 ```bash
 sudo chmod 777 *_data
 ```
+
+**脚本无法运行**
+
+解决方案：添加执行权限
+
+```bash
+sudo chmod +x *.sh
+```
+
+## 参阅
+
+- [Docker compose global level logging - Stack Overflow](https://stackoverflow.com/questions/38567355/docker-compose-global-level-logging)

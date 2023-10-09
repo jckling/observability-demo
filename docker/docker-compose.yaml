@@ -1,13 +1,22 @@
+version: '3.8'
+
+x-logging:
+  &loki-logging
+  driver: loki
+  options:
+    loki-url: "http://localhost:3100/loki/api/v1/push"
+
 services:
   prometheus:
     image: prom/prometheus 
     container_name: prometheus
     restart: unless-stopped
+    logging: *loki-logging
     volumes:
       - ./prometheus:/etc/prometheus
       - ./prometheus_data:/prometheus/data
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--config.file=/etc/prometheus/prometheus.yaml'
     ports:
       - '9090:9090'
     networks:
@@ -17,6 +26,7 @@ services:
     image: prom/pushgateway
     container_name: pushgateway
     restart: unless-stopped
+    logging: *loki-logging
     ports:
       - '9091:9091'
     networks:
@@ -26,11 +36,12 @@ services:
     image:  prom/alertmanager
     container_name: alertmanager
     restart: unless-stopped
+    logging: *loki-logging
     volumes:
       - ./alertmanager:/config
       - ./alertmanager_data:/alertmanager/data
     command:
-      - '--config.file=/config/alertmanager.yml'
+      - '--config.file=/config/alertmanager.yaml'
     ports:
       - '9093:9093'
     networks:
@@ -40,6 +51,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     restart: unless-stopped
+    logging: *loki-logging
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=grafana
@@ -51,10 +63,25 @@ services:
     networks:
       - monitoring
 
+  loki:
+    image:  grafana/loki
+    container_name: loki
+    restart: unless-stopped
+    volumes:
+      - ./loki:/etc/loki
+      - ./loki_data:/loki
+    command:
+      - '--config.file=/etc/loki/loki.yaml'
+    ports:
+      - '3100:3100'
+    networks:
+      - monitoring
+
   consul:
     image: hashicorp/consul
     container_name: consul
     restart: unless-stopped
+    logging: *loki-logging
     volumes:
      - ./consul/server.json:/consul/config/server.json
      - ./consul_data:/consul/data

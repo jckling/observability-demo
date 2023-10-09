@@ -13,3 +13,4 @@ TODO
 - [Configure Grafana | Grafana documentation](https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/)
 - [Provision Grafana | Grafana documentation](https://grafana.com/docs/grafana/latest/administration/provisioning/)
 - [Service - Agent - HTTP API | Consul | HashiCorp Developer](https://developer.hashicorp.com/consul/api-docs/agent/service)
+- [Grafana Loki HTTP API | Grafana Loki documentation](https://grafana.com/docs/loki/latest/reference/api/)
