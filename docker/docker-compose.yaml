@@ -77,6 +77,18 @@ services:
     networks:
       - monitoring
 
+  promtail:
+    image: grafana/promtail
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      - ./promtail:/etc/promtail
+      - ./nginx_data:/var/log/nginx
+    command:
+      - '--config.file=/etc/promtail/promtail.yaml'
+    networks:
+      - monitoring
+
   consul:
     image: hashicorp/consul
     container_name: consul
@@ -89,6 +101,17 @@ services:
       - '8500:8500'
       - '8600:8600/udp'
       - '8600:8600/tcp'
+    networks:
+      - monitoring
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx_data:/var/log/nginx
+    ports:
+      - '8080:80'
     networks:
       - monitoring
 

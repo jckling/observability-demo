@@ -6,11 +6,7 @@ Windows + Docker Desktop + WSL
 
 ## 搭建
 
-prometheus + pushgateway + alertmanager + grafana + loki + consul
-
-```bash
-docker compose up
-```
+prometheus + pushgateway + alertmanager + grafana + loki + consul + promtail + nginx
 
 部署地址
 - Prometheus: http://localhost:9090
@@ -20,6 +16,8 @@ docker compose up
   - username: `admin`
   - password: `grafana`
 - Consul: http://localhost:8500
+- Nginx: http://localhost:8080
+- Promtail: 将数据推送到 Loki，未开放端口
 - Loki: Grafana 中查看
 
 常用命令
@@ -148,6 +146,12 @@ docker plugin disable loki --force
 docker plugin rm loki
 ```
 
+### Promtail
+
+读取 Nginx 日志并推送到 Loki，在 prometheus 中查看：http://localhost:3000
+
+![](images/promtail-nginx.png)
+
 ## 问题解决
 
 **权限不足**
@@ -196,3 +200,4 @@ sudo chmod +x *.sh
 ## 参阅
 
 - [Docker compose global level logging - Stack Overflow](https://stackoverflow.com/questions/38567355/docker-compose-global-level-logging)
+- [Tinkering with Loki, Promtail, Grafana, Prometheus, Nginx and Dnsmasq](https://gist.github.com/ruanbekker/b863902b3c9d7194e28fa68d0860cf6d)
