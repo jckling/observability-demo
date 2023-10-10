@@ -1,0 +1,76 @@
+---
+## prometheus
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-conf
+  labels:
+    name: prometheus-conf
+  namespace: monitoring
+data:
+  prometheus.yaml: |-
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    alerting:
+      alertmanagers:
+        - static_configs:
+          - targets:
+            - alertmanager:9093
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ["localhost:9090"]
+      - job_name: 'pushgateway'
+        honor_timestamps: true
+        metrics_path: /metrics
+        scheme: http
+        static_configs:
+          - targets:
+              - pushgateway:9091
+
+---
+## alertmanager
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-conf
+  labels:
+    name: alertmanager-conf
+  namespace: monitoring
+data:
+  alertmanager.yaml: |-
+    route:
+      receiver: 'mail'
+      repeat_interval: 4h
+      group_by: [ alertname ]
+    receivers:
+      - name: 'mail'
+        email_configs:
+          - smarthost: 'smtp.gmail.com:465'
+            auth_username: 'your_mail@gmail.com'
+            auth_password: ""
+            from: 'your_mail@gmail.com'
+            to: 'some_mail@gmail.com'
+
+---
+## grafana
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-conf
+  labels:
+    name: grafana-conf
+  namespace: monitoring
+data:
+  datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      orgId: 1
+      url: http://prometheus:9090
+      isDefault: true
+      access: proxy
+      editable: true
+      basicAuth: false

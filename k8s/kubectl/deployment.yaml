@@ -1,0 +1,181 @@
+---
+## prometheus
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: monitoring
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus
+          args:
+            - "--storage.tsdb.retention.time=12h"
+            - "--config.file=/etc/prometheus/prometheus.yaml"
+            - "--storage.tsdb.path=/prometheus/"
+          ports:
+            - name: prometheus-port
+              containerPort: 9090
+          resources:
+            requests:
+              cpu: '1'
+              memory: 500M
+            limits:
+              cpu: '1'
+              memory: 1Gi
+          volumeMounts:
+            - name: prometheus-config-volume
+              mountPath: /etc/prometheus/
+            - name: prometheus-storage-volume
+              mountPath: /prometheus/data
+      volumes:
+        - name: prometheus-config-volume
+          configMap:
+            defaultMode: 420
+            name: prometheus-conf
+        - name: prometheus-storage-volume
+          persistentVolumeClaim:
+            claimName: prometheus-pvc
+
+---
+## pushgateway
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pushgateway
+  namespace: monitoring
+  labels:
+    app: pushgateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pushgateway
+  template:
+    metadata:
+      labels:
+        app: pushgateway
+    spec:
+      containers:
+        - name: pushgateway
+          image: prom/pushgateway
+          ports:
+            - name: pushgw-port
+              containerPort: 9091
+          resources:
+            requests:
+              cpu: '1'
+              memory: 500M
+            limits:
+              cpu: '1'
+              memory: 1Gi
+
+---
+## alertmanager
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: monitoring
+  labels:
+    app: alertmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+        - name: alertmanager
+          image: prom/alertmanager
+          args:
+            - "--config.file=/config/alertmanager.yaml"
+          ports:
+            - name: alertmgr-port
+              containerPort: 9093
+          resources:
+            requests:
+              cpu: '1'
+              memory: 500M
+            limits:
+              cpu: '1'
+              memory: 1Gi
+          volumeMounts:
+            - name: alertmanager-config-volume
+              mountPath: /config
+            - name: alertmanager-storage-volume
+              mountPath: /alertmanager/data
+      volumes:
+        - name: alertmanager-config-volume
+          configMap:
+            defaultMode: 420
+            name: alertmanager-conf
+        - name: alertmanager-storage-volume
+          persistentVolumeClaim:
+            claimName: alertmanager-pvc
+
+---
+## grafana
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: admin
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: grafana
+          ports:
+            - name: grafana-port
+              containerPort: 3000
+          resources:
+            requests:
+              cpu: '1'
+              memory: 500M
+            limits:
+              cpu: '1'
+              memory: 1Gi
+          volumeMounts:
+            - name: grafana-config-volume
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-storage-volume
+              mountPath: /var/lib/grafana
+      volumes:
+        - name: grafana-config-volume
+          configMap:
+            defaultMode: 420
+            name: grafana-conf
+        - name: grafana-storage-volume
+          persistentVolumeClaim:
+            claimName: grafana-pvc

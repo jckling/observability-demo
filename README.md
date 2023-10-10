@@ -1,6 +1,9 @@
 # observability-demo
 
-TODO：k8s
+TODO：
+- kubectl/helm：promail + ingress + demo
+- k8s rolebinding
+- docker：通过 promtail 发送容器日志到 loki（缺点：不同系统路径可能不同，目前使用 loki docker plugin 发送容器日志数据）
 
 ## 参阅
 - [Alertmanager Configuration](https://prometheus.io/docs/alerting/latest/configuration/)
