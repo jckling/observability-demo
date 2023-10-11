@@ -107,6 +107,8 @@ localhost 访问需要手动指定端口转发
   - username: `admin`
   - password: `grafana`
 
+### pushgateway
+
 向 pushgateway 推送数据
 
 ```bash
@@ -128,6 +130,19 @@ EOF
 
 ![](images/grafana-metric.png)
 
+### loki
+
+向 loki 推送日志数据
+
+```bash
+curl -v -H "Content-Type: application/json" -XPOST -s "http://monitoring.unity.com/loki/loki/api/v1/push" --data-raw \
+  '{"streams": [{ "stream": { "foo": "bar" }, "values": [ [ "1697020666000000000", "fizzbuzz" ] ] }]}'
+```
+
+![](images/loki-post.png)
+
+![](images/grafana-loki.png)
+
 ## 参阅
 
 kubectl
@@ -135,3 +150,4 @@ kubectl
 - [kubernetes - Minikube with ingress example not working - Stack Overflow](https://stackoverflow.com/questions/58561682/minikube-with-ingress-example-not-working)
 - [Run Grafana behind a reverse proxy | Grafana Labs](https://grafana.com/tutorials/run-grafana-behind-a-proxy/)
 - [ingress-nginx/docs/examples/rewrite/README.md at main · kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx/blob/main/docs/examples/rewrite/README.md)
+- [Install Promtail | Grafana Loki documentation](https://grafana.com/docs/loki/latest/send-data/promtail/installation/)
