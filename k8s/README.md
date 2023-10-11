@@ -64,7 +64,7 @@ kubectl get ingress -n monitoring
 
 访问 http://monitoring.unity.com/grafana
 
-![](image.png)
+![](images/grafana.png)
 
 删除
 
@@ -101,11 +101,32 @@ localhost 访问需要手动指定端口转发
 
 部署地址
 - Prometheus: http://localhost:9090
-- Pushgateway: http://localhost:9091
+- Pushgateway: http://monitoring.unity.com/pushgateway
 - Alertmanager: http://localhost:9093
 - Grafana: http://monitoring.unity.com/grafana
   - username: `admin`
   - password: `grafana`
+
+向 pushgateway 推送数据
+
+```bash
+cat <<EOF | curl --data-binary @- http://monitoring.unity.com/pushgateway/metrics/job/some_job
+# TYPE some_metric counter
+some_metric 31
+EOF
+
+cat <<EOF | curl --data-binary @- http://monitoring.unity.com/pushgateway/metrics/job/some_job/instance/some_instance
+# TYPE some_metric counter
+some_metric{label="val1"} 42
+# TYPE another_metric gauge
+# HELP another_metric Just an example.
+another_metric 2398.283
+EOF
+```
+
+![](images/pushgateway.png)
+
+![](images/grafana-metric.png)
 
 ## 参阅
 
@@ -113,3 +134,4 @@ kubectl
 - [How To Setup Prometheus Monitoring On Kubernetes [Tutorial]](https://devopscube.com/setup-prometheus-monitoring-on-kubernetes/)
 - [kubernetes - Minikube with ingress example not working - Stack Overflow](https://stackoverflow.com/questions/58561682/minikube-with-ingress-example-not-working)
 - [Run Grafana behind a reverse proxy | Grafana Labs](https://grafana.com/tutorials/run-grafana-behind-a-proxy/)
+- [ingress-nginx/docs/examples/rewrite/README.md at main · kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx/blob/main/docs/examples/rewrite/README.md)

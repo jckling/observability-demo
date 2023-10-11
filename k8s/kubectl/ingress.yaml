@@ -1,3 +1,5 @@
+---
+## grafana
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -13,9 +15,33 @@ spec:
     http:
       paths:
       - path: /grafana(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: grafana
             port:
               number: 3000
+
+---
+## pushgateway
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pushgateway-ingress
+  namespace: monitoring
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: monitoring.unity.com
+    http:
+      paths:
+      - path: /pushgateway(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: pushgateway
+            port:
+              number: 9091
