@@ -63,6 +63,22 @@ metadata:
     name: grafana-conf
   namespace: monitoring
 data:
+  grafana.ini: |-
+    [server]
+    domain = monitoring.unity.com
+    root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana/
+    serve_from_sub_path = true
+
+---
+## grafana-datasource
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource
+  labels:
+    name: grafana-datasource
+  namespace: monitoring
+data:
   datasource.yaml: |-
     apiVersion: 1
     datasources:
@@ -74,3 +90,51 @@ data:
       access: proxy
       editable: true
       basicAuth: false
+    - name: Loki
+      type: loki
+      url: http://loki:3100
+      access: proxy
+      editable: false
+
+---
+## loki
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-conf
+  labels:
+    name: loki-conf
+  namespace: monitoring
+data:
+  loki.yaml: |-
+    auth_enabled: false
+    server:
+      http_listen_port: 3100
+      # grpc_listen_port: 9096
+    common:
+      path_prefix: /loki
+      storage:
+        filesystem:
+          chunks_directory: /loki/chunks
+          rules_directory: /loki/rules
+      replication_factor: 1
+      ring:
+        kvstore:
+          store: inmemory
+    query_range:
+      results_cache:
+        cache:
+          embedded_cache:
+            enabled: true
+            max_size_mb: 100
+    schema_config:
+      configs:
+        - from: 2020-10-24
+          store: tsdb
+          object_store: filesystem
+          schema: v12
+          index:
+            prefix: index_
+            period: 24h
+    ruler:
+      alertmanager_url: http://alertmanager:9093

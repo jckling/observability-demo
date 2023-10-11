@@ -42,3 +42,18 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
+---
+## loki
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: loki-pvc
+  namespace: monitoring
+spec:
+  # storageClassName: monitoring
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

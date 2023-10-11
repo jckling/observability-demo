@@ -168,6 +168,8 @@ spec:
               memory: 1Gi
           volumeMounts:
             - name: grafana-config-volume
+              mountPath: /etc/grafana/
+            - name: grafana-datasource-volume
               mountPath: /etc/grafana/provisioning/datasources
             - name: grafana-storage-volume
               mountPath: /var/lib/grafana
@@ -176,6 +178,58 @@ spec:
           configMap:
             defaultMode: 420
             name: grafana-conf
+        - name: grafana-datasource-volume
+          configMap:
+            defaultMode: 420
+            name: grafana-datasource
         - name: grafana-storage-volume
           persistentVolumeClaim:
             claimName: grafana-pvc
+
+---
+## loki
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki
+  namespace: monitoring
+  labels:
+    app: loki
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loki
+  template:
+    metadata:
+      labels:
+        app: loki
+    spec:
+      containers:
+        - name: loki
+          image: grafana/loki
+          args:
+            - "--config.file=/etc/loki/loki.yaml"
+          ports:
+            - name: loki-port
+              containerPort: 3100
+          resources:
+            requests:
+              cpu: '1'
+              memory: 500M
+            limits:
+              cpu: '1'
+              memory: 1Gi
+          volumeMounts:
+            - name: loki-config-volume
+              mountPath: /etc/loki
+            - name: loki-storage-volume
+              mountPath: /loki
+      volumes:
+        - name: loki-config-volume
+          configMap:
+            defaultMode: 420
+            name: loki-conf
+        - name: loki-storage-volume
+          persistentVolumeClaim:
+            claimName: loki-pvc

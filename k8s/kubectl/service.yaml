@@ -8,6 +8,7 @@ metadata:
 spec:
   selector: 
     app: prometheus
+  type: ClusterIP
   ports:
     - port: 9090
       protocol: TCP
@@ -23,6 +24,7 @@ metadata:
 spec:
   selector: 
     app: pushgateway
+  type: ClusterIP
   ports:
     - port: 9091
       protocol: TCP
@@ -38,6 +40,7 @@ metadata:
 spec:
   selector: 
     app: alertmanager
+  type: ClusterIP
   ports:
     - port: 9093
       protocol: TCP
@@ -53,7 +56,24 @@ metadata:
 spec:
   selector: 
     app: grafana
+  type: ClusterIP
   ports:
     - port: 3000
       protocol: TCP
       targetPort: grafana-port
+
+---
+## loki
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+  namespace: monitoring
+spec:
+  selector: 
+    app: loki
+  type: ClusterIP
+  ports:
+    - port: 3100
+      protocol: TCP
+      targetPort: loki-port
