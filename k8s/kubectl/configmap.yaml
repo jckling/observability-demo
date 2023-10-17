@@ -14,9 +14,13 @@ data:
       evaluation_interval: 15s
     alerting:
       alertmanagers:
-        - static_configs:
-          - targets:
-            - alertmanager:9093
+        - consul_sd_configs:
+          - server: "consul:8500"
+            services:
+              - alertmanager
+        # - static_configs:
+        #   - targets:
+        #     - alertmanager:9093
     scrape_configs:
       - job_name: 'prometheus'
         static_configs:
@@ -25,9 +29,13 @@ data:
         honor_timestamps: true
         metrics_path: /metrics
         scheme: http
-        static_configs:
-          - targets:
-              - pushgateway:9091
+        consul_sd_configs:
+          - server: "consul:8500"
+            services:
+              - pushgateway
+        # static_configs:
+        #   - targets:
+        #       - pushgateway:9091
 
 ---
 ## alertmanager
@@ -138,3 +146,29 @@ data:
             period: 24h
     ruler:
       alertmanager_url: http://alertmanager:9093
+
+---
+## consul
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consul-conf
+  labels:
+    name: consul-conf
+  namespace: monitoring
+data:
+  server.json: |-
+    {
+      "datacenter":"dc1",
+      "node_name":"consul",
+      "server":true,
+      "bootstrap":true,
+      "log_level":"INFO",
+      "data_dir":"/consul/data",
+      "ui_config":{
+          "enabled":true
+      },
+      "addresses":{
+          "http":"0.0.0.0"
+      }
+    }

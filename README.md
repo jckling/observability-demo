@@ -1,8 +1,7 @@
 # observability-demo
 
 TODO：
-- kubectl/helm：promail + consul + demo
-- k8s: rolebinding, ingress authentication
+- helm
 - docker：通过 promtail 发送容器日志到 loki（缺点：不同系统路径可能不同，目前使用 loki docker plugin 发送容器日志数据）
 
 ## 参阅

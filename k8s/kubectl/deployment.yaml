@@ -233,3 +233,49 @@ spec:
         - name: loki-storage-volume
           persistentVolumeClaim:
             claimName: loki-pvc
+
+---
+## consul
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul
+  namespace: monitoring
+  labels:
+    app: consul
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      labels:
+        app: consul
+    spec:
+      containers:
+        - name: consul
+          image: hashicorp/consul
+          ports:
+            - name: consul-port
+              containerPort: 8500
+          resources:
+            requests:
+              cpu: '1'
+              memory: 500M
+            limits:
+              cpu: '1'
+              memory: 1Gi
+          volumeMounts:
+            - name: consul-config-volume
+              mountPath: /consul/config/server.json
+            - name: consul-storage-volume
+              mountPath: /consul/data
+      volumes:
+        - name: consul-config-volume
+          configMap:
+            defaultMode: 420
+            name: consul-conf
+        - name: consul-storage-volume
+          persistentVolumeClaim:
+            claimName: consul-pvc

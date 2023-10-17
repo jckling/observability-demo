@@ -100,14 +100,15 @@ kubectl exec -it grafana-68768c78b7-4spss  -n monitoring -- /bin/bash
 localhost 访问需要手动指定端口转发
 
 部署地址
-- Prometheus: http://localhost:9090
+- Prometheus: http://monitoring.unity.com/prometheus
 - Pushgateway: http://monitoring.unity.com/pushgateway
 - Alertmanager: http://localhost:9093
 - Grafana: http://monitoring.unity.com/grafana
   - username: `admin`
   - password: `grafana`
+- Consul: http://monitoring.unity.com/consul
 
-### pushgateway
+### Pushgateway
 
 向 pushgateway 推送数据
 
@@ -130,7 +131,7 @@ EOF
 
 ![](images/grafana-metric.png)
 
-### loki
+### Loki
 
 向 loki 推送日志数据
 
@@ -144,7 +145,7 @@ curl -v -H "Content-Type: application/json" -XPOST -s "http://monitoring.unity.c
 ![](images/grafana-loki.png)
 
 
-### promtail
+### Promtail
 
 创建 DaemonSet（`default` 命名空间）
 
@@ -168,6 +169,30 @@ kubectl create -f daemonset.yaml
 kubectl delete -f nginx.yaml
 kubectl delete -f daemonset.yaml
 ```
+
+### Consul
+
+进入 `observability-demo/k8s/kubectl/consul` 目录，调用脚本注册服务
+
+```bash
+# 注册服务
+./register-service.sh -r
+
+# 删除服务
+./register-service.sh -d
+```
+
+进入 `observability-demo/k8s/kubectl/pushgateway` 目录，调用脚本推送
+
+```bash
+# 推送指标
+./push-metrics.sh -p
+
+# 删除指标
+./push-metrics.sh -d
+```
+
+如果没有注册服务，prometheus 会读不到推给 pushgateway 的数据
 
 ## 参阅
 

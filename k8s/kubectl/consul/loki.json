@@ -1,0 +1,22 @@
+{
+    "ID":"loki",
+    "Name":"loki",
+    "Tags":[
+        "loki",
+        "v1"
+    ],
+    "Address": "loki",
+    "Port":3100,
+    "Meta":{
+        "os":"linux"
+    },
+    "EnableTagOverride":false,
+    "Check":{
+        "http": "http://monitoring.unity.com/consul/loki/ready",
+        "interval": "10s"
+    },
+    "Weights":{
+        "Passing":10,
+        "Warning":1
+    }
+}

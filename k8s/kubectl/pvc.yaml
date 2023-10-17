@@ -57,3 +57,18 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
+---
+## consul
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: consul-pvc
+  namespace: monitoring
+spec:
+  # storageClassName: monitoring
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
