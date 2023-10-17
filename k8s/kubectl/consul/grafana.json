@@ -5,14 +5,14 @@
         "grafana",
         "v1"
     ],
-    "Address": "grafana",
-    "Port":3000,
+    "Address": "http://monitoring.unity.com/grafana",
+    "Port":80,
     "Meta":{
         "os":"linux"
     },
     "EnableTagOverride":false,
     "Check":{
-        "http": "http://monitoring.unity.com/consul/grafana/api/health",
+        "http": "http://grafana:3000/api/health",
         "interval": "10s"
     },
     "Weights":{

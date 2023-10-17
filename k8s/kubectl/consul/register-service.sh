@@ -1,6 +1,6 @@
 #!/bin/bash
 
-services=("prometheus" "pushgateway" "alertmanager" "grafana" "loki")
+services=("prometheus" "pushgateway" "grafana" "loki")
 
 Register()
 {

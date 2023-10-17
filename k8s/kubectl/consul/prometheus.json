@@ -5,14 +5,14 @@
         "prometheus",
         "v1"
     ],
-    "Address": "prometheus",
-    "Port":9090,
+    "Address": "http://monitoring.unity.com/prometheus",
+    "Port":80,
     "Meta":{
         "os":"linux"
     },
     "EnableTagOverride":false,
     "Check":{
-        "http": "http://monitoring.unity.com/consul/prometheus/-/healthy",
+        "http": "http://prometheus:9090/-/healthy",
         "interval": "10s"
     },
     "Weights":{

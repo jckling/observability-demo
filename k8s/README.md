@@ -100,13 +100,13 @@ kubectl exec -it grafana-68768c78b7-4spss  -n monitoring -- /bin/bash
 localhost 访问需要手动指定端口转发
 
 部署地址
-- Prometheus: http://monitoring.unity.com/prometheus
-- Pushgateway: http://monitoring.unity.com/pushgateway
+- Prometheus: http://monitoring.unity.com/prometheus/graph
+- Pushgateway: http://monitoring.unity.com/pushgateway/#
 - Alertmanager: http://localhost:9093
 - Grafana: http://monitoring.unity.com/grafana
   - username: `admin`
   - password: `grafana`
-- Consul: http://monitoring.unity.com/consul
+- Consul: http://monitoring.unity.com/ui/dc1/services
 
 ### Pushgateway
 
