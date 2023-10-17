@@ -136,12 +136,38 @@ EOF
 
 ```bash
 curl -v -H "Content-Type: application/json" -XPOST -s "http://monitoring.unity.com/loki/loki/api/v1/push" --data-raw \
-  '{"streams": [{ "stream": { "foo": "bar" }, "values": [ [ "1697020666000000000", "fizzbuzz" ] ] }]}'
+  '{"streams": [{ "stream": { "foo": "bar" }, "values": [ [ "1697523015000000000", "fizzbuzz" ] ] }]}'
 ```
 
 ![](images/loki-post.png)
 
 ![](images/grafana-loki.png)
+
+
+### promtail
+
+创建 DaemonSet（`default` 命名空间）
+
+```bash
+kubectl create -f daemonset.yaml
+```
+
+![](images/promtail-daemonset.png)
+
+运行 nginx
+
+```bash
+kubectl create -f daemonset.yaml
+```
+
+![](images/promtail-nginx.png)
+
+删除
+
+```bash
+kubectl delete -f nginx.yaml
+kubectl delete -f daemonset.yaml
+```
 
 ## 参阅
 
